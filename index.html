@@ -6,82 +6,245 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>News App</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f4f4f4;
+    :root {
+      --primary-color: #1a1a2e;
+      --secondary-color: #e94560;
+      --text-color: #333;
+      --light-gray: #f9f9f9;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
     }
 
     .container {
-      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
       background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      width: 80%;
-      max-width: 600px;
+      text-align: center;
+      position: relative;
+    }
+
+    header h2 {
+      font-size: 28px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .search-container {
+      padding: 20px;
+      background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
     }
 
     input {
-      padding: 10px;
-      margin: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      width: 80%;
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    input:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
     }
 
     button {
-      padding: 10px 15px;
-      border: none;
-      background-color: #ff4500;
+      background-color: var(--secondary-color);
       color: white;
-      border-radius: 5px;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      margin: 10px 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(233, 69, 96, 0.3);
+    }
+
+    button:hover {
+      background-color: #d13652;
+      transform: translateY(-2px);
     }
 
     #news-container {
-      margin-top: 20px;
-      text-align: left;
+      padding: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
     }
 
     .news-item {
-      margin-bottom: 15px;
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
+      margin-bottom: 25px;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+      border-left: 4px solid var(--secondary-color);
+    }
+
+    .news-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .news-item h3 {
-      margin: 0;
-      font-size: 18px;
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: var(--primary-color);
+      line-height: 1.4;
+    }
+
+    .news-item p {
+      color: #666;
+      margin-bottom: 15px;
+      font-size: 16px;
     }
 
     .news-item a {
-      color: #008CBA;
+      display: inline-block;
+      color: var(--secondary-color);
       text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 6px 0;
+      position: relative;
+    }
+
+    .news-item a::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--secondary-color);
+      transform: scaleX(0);
+      transform-origin: bottom right;
+      transition: transform 0.3s ease;
+    }
+
+    .news-item a:hover::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+
+    .news-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #999;
+      margin-top: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      font-style: italic;
+      color: #666;
+    }
+
+    .error-message {
+      color: var(--secondary-color);
+      text-align: center;
+      padding: 20px;
+      font-weight: 500;
+    }
+
+    .source-badge {
+      display: inline-block;
+      background-color: var(--light-gray);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .empty-state p {
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        width: 100%;
+      }
+
+      header h2 {
+        font-size: 24px;
+      }
+
+      .news-item h3 {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h2>Latest News</h2>
-    <input type="text" id="country" placeholder="Enter country code (e.g., us, in, gb)">
-    <button onclick="getNews()">Get News</button>
-    <div id="news-container"></div>
+    <header>
+      <h2>Global News Digest</h2>
+      <p>Stay updated with the latest headlines around the world</p>
+    </header>
+
+    <div class="search-container">
+      <input type="text" id="country" placeholder="Enter country code (e.g., us, in, gb)">
+      <button onclick="getNews()">Get Headlines</button>
+    </div>
+
+    <div id="news-container">
+      <div class="empty-state">
+        <p>Enter a country code to see the latest headlines</p>
+        <p>Examples: us (United States), in (India), gb (United Kingdom), au (Australia)</p>
+      </div>
+    </div>
   </div>
 
   <script>
     async function getNews() {
       const country = document.getElementById('country').value.trim();
+      const newsContainer = document.getElementById('news-container');
+
       if (!country) {
-        alert('Please enter a country code');
+        newsContainer.innerHTML = `<div class="error-message">Please enter a country code</div>`;
         return;
       }
+
+      newsContainer.innerHTML = `<div class="loading">Loading latest headlines...</div>`;
 
       const apiKey = '3bddac3e54304afab4c6b9fef7c6447d';
       const url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${apiKey}`;
@@ -91,24 +254,39 @@
         const data = await response.json();
 
         if (data.status !== 'ok') {
-          document.getElementById('news-container').innerHTML = `Error: Failed to fetch news`;
+          newsContainer.innerHTML = `<div class="error-message">Error: Failed to fetch news</div>`;
+          return;
+        }
+
+        if (data.articles.length === 0) {
+          newsContainer.innerHTML = `<div class="empty-state">
+                        <p>No news found for country code: ${country}</p>
+                        <p>Please try another country code or check if it's valid</p>
+                    </div>`;
           return;
         }
 
         let newsHTML = '';
         data.articles.forEach(article => {
+          const publishedDate = article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : 'Unknown date';
+
           newsHTML += `
                         <div class="news-item">
-                            <h3>${article.title}</h3>
+                            ${article.source?.name ? `<div class="source-badge">${article.source.name}</div>` : ''}
+                            <h3>${article.title || 'Untitled'}</h3>
                             <p>${article.description || 'No description available.'}</p>
-                            <a href="${article.url}" target="_blank">Read more</a>
+                            <a href="${article.url}" target="_blank">Read full story</a>
+                            <div class="news-meta">
+                                <span>Published: ${publishedDate}</span>
+                                ${article.author ? `<span>By: ${article.author}</span>` : ''}
+                            </div>
                         </div>
                     `;
         });
 
-        document.getElementById('news-container').innerHTML = newsHTML;
+        newsContainer.innerHTML = newsHTML;
       } catch (error) {
-        document.getElementById('news-container').innerHTML = 'Failed to load news';
+        newsContainer.innerHTML = `<div class="error-message">Failed to load news. Please try again later.</div>`;
       }
     }
   </script>
