@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 600px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 80%;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #ff4500;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+
+    #news-container {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .news-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .news-item h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .news-item a {
+      color: #008CBA;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Latest News</h2>
+    <input type="text" id="country" placeholder="Enter country code (e.g., us, in, gb)">
+    <button onclick="getNews()">Get News</button>
+    <div id="news-container"></div>
+  </div>
+
+  <script>
+    async function getNews() {
+      const country = document.getElementById('country').value.trim();
+      if (!country) {
+        alert('Please enter a country code');
+        return;
+      }
+
+      const apiKey = '3bddac3e54304afab4c6b9fef7c6447d';
+      const url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${apiKey}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.status !== 'ok') {
+          document.getElementById('news-container').innerHTML = `Error: Failed to fetch news`;
+          return;
+        }
+
+        let newsHTML = '';
+        data.articles.forEach(article => {
+          newsHTML += `
+                        <div class="news-item">
+                            <h3>${article.title}</h3>
+                            <p>${article.description || 'No description available.'}</p>
+                            <a href="${article.url}" target="_blank">Read more</a>
+                        </div>
+                    `;
+        });
+
+        document.getElementById('news-container').innerHTML = newsHTML;
+      } catch (error) {
+        document.getElementById('news-container').innerHTML = 'Failed to load news';
+      }
+    }
+  </script>
+</body>
+
+</html>
